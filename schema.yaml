@@ -1,0 +1,51 @@
+name: TMR World Engine
+description: Deterministic replay and bounded counterfactual analysis service for GKE.
+version: 0.5.1
+properties:
+  image.repository:
+    type: string
+    title: Container image repository
+    description: Artifact Registry repository containing the approved TMR-WE image.
+    default: us-docker.pkg.dev/PROJECT_ID/tmrwe/tmrwe
+  image.tag:
+    type: string
+    title: Container image tag
+    description: Immutable release tag for the approved image.
+    default: 0.5.1
+  service.type:
+    type: enum
+    title: Kubernetes service type
+    description: Keep ClusterIP unless an explicit customer network design requires another type.
+    default: ClusterIP
+    enum:
+      - ClusterIP
+      - LoadBalancer
+  resources.requests.cpu:
+    type: string
+    title: CPU request
+    default: 250m
+  resources.requests.memory:
+    type: string
+    title: Memory request
+    default: 256Mi
+  resources.limits.cpu:
+    type: string
+    title: CPU limit
+    default: "1"
+  resources.limits.memory:
+    type: string
+    title: Memory limit
+    default: 512Mi
+  existingTlsSecret:
+    type: string
+    title: Existing TLS secret
+    description: Kubernetes Secret containing server.crt, server.key, and client-ca.crt.
+  existingAuthSecret:
+    type: string
+    title: Existing authentication secret
+    description: Kubernetes Secret containing the token key used by the gRPC service.
+  allowedClientCidrs:
+    type: string
+    title: Allowed client CIDRs
+    description: Comma-separated CIDRs used to generate the optional NetworkPolicy.
+    default: ""

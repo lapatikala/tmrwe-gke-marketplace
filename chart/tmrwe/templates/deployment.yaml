@@ -1,0 +1,80 @@
+{{- if or (eq .Values.existingTlsSecret "") (eq .Values.existingAuthSecret "") }}
+{{- fail "existingTlsSecret and existingAuthSecret are required; create them before installing TMR-WE" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tmrwe.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tmrwe.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "tmrwe.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tmrwe.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: tmrwe
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          args:
+            - --host=0.0.0.0
+            - --port={{ .Values.service.port | quote }}
+            - --tls-cert-file=/run/tls/server.crt
+            - --tls-key-file=/run/tls/server.key
+            - --mtls-client-ca-file=/run/tls/client-ca.crt
+            - --auth-token-file=/run/auth/token
+            - --tls-min-validity-seconds=86400
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tls
+              mountPath: /run/tls
+              readOnly: true
+            - name: auth
+              mountPath: /run/auth
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tls
+          secret:
+            secretName: {{ .Values.existingTlsSecret }}
+            items:
+              - key: server.crt
+                path: server.crt
+              - key: server.key
+                path: server.key
+              - key: client-ca.crt
+                path: client-ca.crt
+        - name: auth
+          secret:
+            secretName: {{ .Values.existingAuthSecret }}
+            items:
+              - key: token
+                path: token
+        - name: tmp
+          emptyDir: {}

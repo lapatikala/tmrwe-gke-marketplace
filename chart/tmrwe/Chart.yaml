@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tmrwe
+description: TMR World Engine deterministic replay service
+type: application
+version: 0.5.1
+appVersion: 0.5.1

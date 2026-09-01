@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package tmrwe.api.v1;
+
+// Versioned gRPC contract implemented by the local loopback and opt-in TLS hosts.
+// Each JSON field is UTF-8 canonical JSON using tmrwe.replay-bundle/v1 rules.
+service WorldEngine {
+  rpc GetCapabilities(GetCapabilitiesRequest) returns (Capabilities);
+  rpc ValidateReplayBundle(ReplayBundlePayload) returns (ReplayValidation);
+  rpc ReplayBundle(ReplayBundlePayload) returns (ReplayResult);
+  rpc ReplayBundleWithTrace(ReplayBundlePayload) returns (stream TraceUpdate);
+  // Admin-only live TLS rotation. The request is valid only on an explicitly
+  // configured rotatable TLS host and requires the rotation auth policy.
+  rpc RotateTlsCertificate(RotateTlsCertificateRequest) returns (RotateTlsCertificateResponse);
+}
+
+message GetCapabilitiesRequest {}
+
+message Capabilities {
+  string api_version = 1;
+  repeated string replay_bundle_versions = 2;
+  repeated string local_transports = 3;
+}
+
+message ReplayBundlePayload {
+  bytes manifest_json = 1;
+  bytes checkpoint_json = 2;
+  bytes operation_journal_json = 3;
+}
+
+message ReplayValidation {
+  string semantic_state_digest = 1;
+  string expected_final_checkpoint_id = 2;
+  repeated string expected_trace_ids = 3;
+}
+
+message ReplayResult {
+  string semantic_state_digest = 1;
+  string final_checkpoint_id = 2;
+  repeated string trace_ids = 3;
+}
+
+message TraceUpdate {
+  uint32 operation_index = 1;
+  string trace_id = 2;
+  string checkpoint_id = 3;
+}
+
+message RotateTlsCertificateRequest {
+  bytes certificate_chain = 1;
+  bytes private_key = 2;
+}
+
+message RotateTlsCertificateResponse {
+  uint64 generation = 1;
+  string certificate_sha256 = 2;
+  string not_valid_after_utc = 3;
+}

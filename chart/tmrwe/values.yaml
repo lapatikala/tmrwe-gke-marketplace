@@ -1,0 +1,37 @@
+image:
+  repository: us-docker.pkg.dev/PROJECT_ID/tmrwe/tmrwe
+  tag: 0.5.1
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 50051
+
+existingTlsSecret: ""
+existingAuthSecret: ""
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+replicaCount: 1
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+
+networkPolicy:
+  enabled: false
+  allowedClientCidrs: []
+
+nameOverride: ""
+fullnameOverride: ""
