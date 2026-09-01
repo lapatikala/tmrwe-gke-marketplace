@@ -16,7 +16,7 @@
 
 # Pin the Google Marketplace Helm deployer base by digest for reproducible
 # packaging builds. The base image is published by Google's marketplace-k8s-app-tools.
-FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm@sha256:60bc54af5578550df364109be383ea575ea97fdcae4c8236398f8647a5f75bee
+FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm/onbuild@sha256:6a6d705987be9dacb976540b02901250bf09324c2fdc641f64c014da696bd198
 
 COPY chart/tmrwe /data/chart/tmrwe
 COPY schema.yaml /data/schema.yaml

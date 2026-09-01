@@ -1,6 +1,6 @@
 name: TMR World Engine
 description: Deterministic replay and bounded counterfactual analysis service for GKE.
-version: 0.5.4
+version: 0.5.10
 application_api_version: v1beta1
 properties:
   name:
@@ -13,7 +13,7 @@ properties:
       type: NAMESPACE
   image.full:
     type: string
-    default: gcr.io/tmr-we-sdk-pilot/tmrwe/tmrwe:0.5.3
+    default: gcr.io/tmr-we-sdk-pilot/tmrwe/tmrwe:0.5.10
     x-google-marketplace:
       type: IMAGE
       image:
@@ -53,6 +53,24 @@ properties:
     type: string
     title: Existing authentication secret
     description: Kubernetes Secret containing the token key used by the gRPC service.
+  tlsCertificate:
+    type: string
+    title: TLS certificate
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: TLS_CERTIFICATE_KEY
+          base64EncodedCertificate: TLS_CERTIFICATE_CRT
+  authToken:
+    type: string
+    title: Authentication token
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 32
+        includeSymbols: false
+        base64: true
   allowedClientCidrs:
     type: string
     title: Allowed client CIDRs

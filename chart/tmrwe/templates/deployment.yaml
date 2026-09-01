@@ -1,5 +1,21 @@
-{{- if or (eq .Values.existingTlsSecret "") (eq .Values.existingAuthSecret "") }}
-{{- fail "existingTlsSecret and existingAuthSecret are required; create them before installing TMR-WE" }}
+{{- if or (and (ne .Values.existingTlsSecret "") (eq .Values.existingAuthSecret "")) (and (eq .Values.existingTlsSecret "") (ne .Values.existingAuthSecret "")) }}
+{{- fail "existingTlsSecret and existingAuthSecret must be supplied together" }}
+{{- end }}
+{{- if and (eq .Values.existingTlsSecret "") (eq .Values.existingAuthSecret "") }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tmrwe-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tmrwe.labels" . | nindent 4 }}
+type: Opaque
+data:
+  server.crt: {{ required "TLS_CERTIFICATE_CRT is required when external TLS secrets are not supplied" .Values.TLS_CERTIFICATE_CRT | quote }}
+  server.key: {{ required "TLS_CERTIFICATE_KEY is required when external TLS secrets are not supplied" .Values.TLS_CERTIFICATE_KEY | quote }}
+  client-ca.crt: {{ required "TLS_CERTIFICATE_CRT is required when external TLS secrets are not supplied" .Values.TLS_CERTIFICATE_CRT | quote }}
+  token: {{ required "authToken is required when external auth secrets are not supplied" .Values.authToken | quote }}
+---
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
@@ -28,7 +44,7 @@ spec:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}
           args:
             - --host=0.0.0.0
-            - --port={{ .Values.service.port | quote }}
+            - --port={{ .Values.service.port }}
             - --tls-cert-file=/run/tls/server.crt
             - --tls-key-file=/run/tls/server.key
             - --mtls-client-ca-file=/run/tls/client-ca.crt
@@ -62,7 +78,7 @@ spec:
       volumes:
         - name: tls
           secret:
-            secretName: {{ .Values.existingTlsSecret }}
+            secretName: {{ default "tmrwe-credentials" .Values.existingTlsSecret }}
             items:
               - key: server.crt
                 path: server.crt
@@ -72,7 +88,7 @@ spec:
                 path: client-ca.crt
         - name: auth
           secret:
-            secretName: {{ .Values.existingAuthSecret }}
+            secretName: {{ default "tmrwe-credentials" .Values.existingAuthSecret }}
             items:
               - key: token
                 path: token

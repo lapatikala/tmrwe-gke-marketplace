@@ -11,8 +11,8 @@ repository tree rather than a fixture, because only the real tree is what
 gets published.
 
 The second is a packaging gate: the files and guards Google Cloud Marketplace
-requires are present, and the chart still refuses to start an unauthenticated
-service.
+requires are present, and the chart provisions credentials or requires a
+complete external credential pair.
 
 Run offline, no dependencies:
 
@@ -137,16 +137,20 @@ def main() -> int:
         "deployer image copies no runtime source",
     )
 
-    # --- Packaging: the chart fails closed without credentials --------------
+    # --- Packaging: the chart provisions credentials safely -----------------
 
     deployment = (ROOT / "chart" / "tmrwe" / "templates" / "deployment.yaml").read_text(
         encoding="utf-8"
     )
     check(
-        "fail" in deployment
-        and "existingTlsSecret" in deployment
-        and "existingAuthSecret" in deployment,
-        "chart refuses to install without TLS and auth secrets",
+        "TLS_CERTIFICATE_CRT" in deployment
+        and "TLS_CERTIFICATE_KEY" in deployment
+        and "authToken" in deployment,
+        "chart provisions generated TLS and auth credentials",
+    )
+    check(
+        "must be supplied together" in deployment,
+        "chart rejects a partial external credential pair",
     )
     check(
         "--mtls-client-ca-file" in deployment,
