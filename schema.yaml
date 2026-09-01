@@ -1,17 +1,26 @@
 name: TMR World Engine
 description: Deterministic replay and bounded counterfactual analysis service for GKE.
-version: 0.5.1
+version: 0.5.2
+application_api_version: v1beta1
 properties:
-  image.repository:
+  name:
     type: string
-    title: Container image repository
-    description: Artifact Registry repository containing the approved TMR-WE image.
-    default: us-docker.pkg.dev/PROJECT_ID/tmrwe/tmrwe
-  image.tag:
+    x-google-marketplace:
+      type: NAME
+  namespace:
     type: string
-    title: Container image tag
-    description: Immutable release tag for the approved image.
-    default: 0.5.1
+    x-google-marketplace:
+      type: NAMESPACE
+  image.full:
+    type: string
+    default: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tmrwe:0.5.2
+    x-google-marketplace:
+      type: IMAGE
+      image:
+        generatedProperties:
+          splitByColon:
+            before: image.repository
+            after: image.tag
   service.type:
     type: enum
     title: Kubernetes service type
@@ -49,3 +58,7 @@ properties:
     title: Allowed client CIDRs
     description: Comma-separated CIDRs used to generate the optional NetworkPolicy.
     default: ""
+required:
+  - name
+  - namespace
+  - image.full
