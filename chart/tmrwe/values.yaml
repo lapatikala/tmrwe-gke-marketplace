@@ -1,6 +1,6 @@
 image:
   repository: us-docker.pkg.dev/PROJECT_ID/tmrwe/tmrwe
-  tag: 0.5.3
+  tag: 0.5.4
   pullPolicy: IfNotPresent
 
 service:

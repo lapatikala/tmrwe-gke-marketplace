@@ -1,6 +1,6 @@
 name: TMR World Engine
 description: Deterministic replay and bounded counterfactual analysis service for GKE.
-version: 0.5.3
+version: 0.5.4
 application_api_version: v1beta1
 properties:
   name:
@@ -22,7 +22,7 @@ properties:
             before: image.repository
             after: image.tag
   service.type:
-    type: enum
+    type: string
     title: Kubernetes service type
     description: Keep ClusterIP unless an explicit customer network design requires another type.
     default: ClusterIP
