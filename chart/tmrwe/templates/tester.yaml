@@ -1,0 +1,58 @@
+{{- if .Values.test.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "tmrwe.fullname" . }}-tester
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    marketplace.cloud.google.com/verification: test
+  labels:
+    {{- include "tmrwe.labels" . | nindent 4 }}
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: grpc-smoke-test
+      image: "{{ .Values.test.image }}"
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh", "-c"]
+      args:
+        - >-
+          grpcurl -insecure
+          -import-path /etc/tmrwe
+          -proto world_engine.proto
+          -cert /run/credentials/server.crt
+          -key /run/credentials/server.key
+          -H "authorization: Bearer ${TMRWE_TOKEN}"
+          {{ include "tmrwe.fullname" . }}:{{ .Values.service.port }}
+          tmrwe.api.v1.WorldEngine/GetCapabilities
+      env:
+        - name: TMRWE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ default "tmrwe-credentials" .Values.existingAuthSecret }}
+              key: token
+      volumeMounts:
+        - name: credentials
+          mountPath: /run/credentials
+          readOnly: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi
+  volumes:
+    - name: credentials
+      secret:
+        secretName: {{ default "tmrwe-credentials" .Values.existingTlsSecret }}
+        items:
+          - key: server.crt
+            path: server.crt
+          - key: server.key
+            path: server.key
+{{- end }}

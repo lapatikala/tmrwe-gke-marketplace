@@ -20,3 +20,4 @@ FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm/onbuild@sha256:6a6d705987b
 
 COPY chart/tmrwe /data/chart/tmrwe
 COPY schema.yaml /data/schema.yaml
+COPY data-test /data-test

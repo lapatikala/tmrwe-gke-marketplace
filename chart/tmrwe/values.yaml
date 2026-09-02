@@ -19,6 +19,9 @@ resources:
     memory: 512Mi
 
 replicaCount: 1
+test:
+  enabled: false
+  image: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tester:0.5.11
 podSecurityContext:
   runAsNonRoot: true
   seccompProfile:

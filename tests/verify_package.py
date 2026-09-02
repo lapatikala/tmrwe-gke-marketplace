@@ -50,6 +50,8 @@ REQUIRED_FILES = (
     "chart/tmrwe/templates/application.yaml",
     "chart/tmrwe/templates/deployment.yaml",
     "chart/tmrwe/templates/service.yaml",
+    "chart/tmrwe/templates/tester.yaml",
+    "tester/Dockerfile",
 )
 
 failures: list[str] = []
@@ -175,6 +177,16 @@ def main() -> int:
     check(
         "kind: Application" in application and "app.k8s.io" in application,
         "chart declares the Marketplace Application resource",
+    )
+
+    tester = (ROOT / "chart" / "tmrwe" / "templates" / "tester.yaml").read_text(
+        encoding="utf-8"
+    )
+    check(
+        "marketplace.cloud.google.com/verification: test" in tester
+        and "tmrwe.api.v1.WorldEngine/GetCapabilities" in tester
+        and "secretKeyRef" in tester,
+        "chart declares an authenticated gRPC verification tester",
     )
 
     # --- Claim discipline ---------------------------------------------------
