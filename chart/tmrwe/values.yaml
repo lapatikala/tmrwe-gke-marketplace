@@ -1,6 +1,6 @@
 image:
   repository: us-docker.pkg.dev/PROJECT_ID/tmrwe/tmrwe
-  tag: 0.5.11
+  tag: 0.5.18
   pullPolicy: IfNotPresent
 
 service:
@@ -21,7 +21,7 @@ resources:
 replicaCount: 1
 test:
   enabled: false
-  image: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tester:0.5.11
+  image: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tester:0.5.18
 podSecurityContext:
   runAsNonRoot: true
   seccompProfile:

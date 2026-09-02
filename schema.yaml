@@ -1,6 +1,6 @@
 name: TMR World Engine
 description: Deterministic replay and bounded counterfactual analysis service for GKE.
-version: 0.5.17
+version: 0.5.18
 application_api_version: v1beta1
 properties:
   name:
@@ -13,7 +13,7 @@ properties:
       type: NAMESPACE
   image.full:
     type: string
-    default: gcr.io/tmr-we-sdk-pilot/tmrwe/tmrwe:0.5.11
+    default: gcr.io/tmr-we-sdk-pilot/tmrwe/tmrwe:0.5.18
     x-google-marketplace:
       type: IMAGE
       image:

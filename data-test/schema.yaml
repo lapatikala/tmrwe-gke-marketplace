@@ -2,7 +2,7 @@
 # Marketplace deployer and are not exposed as customer configuration.
 name: TMR World Engine verification
 description: Verification defaults for the gRPC/mTLS smoke test.
-version: 0.5.17
+version: 0.5.18
 application_api_version: v1beta1
 properties:
   test.enabled:
@@ -10,4 +10,4 @@ properties:
     default: true
   test.image:
     type: string
-    default: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tester:0.5.11
+    default: asia-southeast1-docker.pkg.dev/tmr-we-sdk-pilot/tmrwe/tester:0.5.18
